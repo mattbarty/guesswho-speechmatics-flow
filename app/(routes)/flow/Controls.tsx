@@ -1,6 +1,8 @@
 import { type ChangeEvent, useState } from 'react';
 import { useFlow } from '@speechmatics/flow-client-react';
 import { useAudioDevices } from '@speechmatics/browser-audio-input-react';
+import { TemplateForm } from './TemplateForm';
+import { TemplateVariables } from './types';
 
 export function Controls({
   loading,
@@ -13,14 +15,19 @@ export function Controls({
   startSession: ({
     deviceId,
     personaId,
-  }: { deviceId?: string; personaId: string; }) => Promise<void>;
+    templateVariables,
+  }: {
+    deviceId?: string;
+    personaId: string;
+    templateVariables: TemplateVariables;
+  }) => Promise<void>;
   stopSession: () => Promise<void>;
 }) {
   const { socketState } = useFlow();
   const connected = socketState === 'open';
   const [personaId, setPersonaId] = useState(Object.keys(personas)[0]);
-
   const [deviceId, setDeviceId] = useState<string>();
+  const [templateVariables, setTemplateVariables] = useState<TemplateVariables>({});
 
   return (
     <article>
@@ -41,6 +48,12 @@ export function Controls({
           </select>
         </label>
       </div>
+
+      <TemplateForm
+        variables={templateVariables}
+        onChange={setTemplateVariables}
+      />
+
       <div className="grid">
         <button
           type="button"
@@ -49,7 +62,11 @@ export function Controls({
           onClick={
             connected
               ? stopSession
-              : () => startSession({ personaId, deviceId })
+              : () => startSession({
+                personaId,
+                deviceId,
+                templateVariables,
+              })
           }
         >
           {connected ? 'Stop conversation' : 'Start conversation'}

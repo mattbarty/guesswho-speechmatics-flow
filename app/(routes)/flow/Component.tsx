@@ -12,6 +12,8 @@ import { Status } from './Status';
 import { ErrorFallback } from '@/lib/components/ErrorFallback';
 import { OutputView } from './OutputView';
 import { useFlow, useFlowEventListener } from '@speechmatics/flow-client-react';
+import { ConversationConfig, TemplateVariables } from './types';
+import { sanitizeTemplateVariables } from './utils';
 
 export default function Component({
   jwt,
@@ -44,24 +46,46 @@ export default function Component({
     async ({
       personaId,
       deviceId,
-    }: { personaId: string; deviceId?: string; }) => {
+      templateVariables,
+    }: {
+      personaId: string;
+      deviceId?: string;
+      templateVariables: TemplateVariables;
+    }) => {
       try {
         setLoading(true);
+        console.log('Starting session with:', {
+          personaId,
+          deviceId,
+          rawTemplateVariables: templateVariables
+        });
+
         const audioContext = new AudioContext({ sampleRate: SAMPLE_RATE });
         setAudioContext(audioContext);
-        await startConversation(jwt, {
+
+        // Transform variables to API-compatible format
+        const apiTemplateVariables = sanitizeTemplateVariables(templateVariables);
+        console.log('Sanitized template variables:', apiTemplateVariables);
+
+        const config = {
           config: {
             template_id: personaId,
-            template_variables: {},
+            template_variables: apiTemplateVariables,
           },
           audioFormat: {
             type: 'raw',
             encoding: 'pcm_f32le',
             sample_rate: SAMPLE_RATE,
           },
-        });
+        };
+
+        console.log('Final conversation config:', config);
+
+        await startConversation(jwt, config);
         const mediaStream = await startRecording(audioContext, deviceId);
         setMediaStream(mediaStream);
+      } catch (error) {
+        console.error('Error starting conversation:', error);
       } finally {
         setLoading(false);
       }
