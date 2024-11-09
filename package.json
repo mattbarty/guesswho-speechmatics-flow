@@ -9,10 +9,14 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@picocss/pico": "^2.0.6",
+    "@speechmatics/browser-audio-input-react": "^0.0.1",
     "@speechmatics/flow-client": "^0.1.1",
+    "@speechmatics/flow-client-react": "^0.1.1",
     "next": "15.0.3",
     "react": "19.0.0-rc-66855b96-20241106",
-    "react-dom": "19.0.0-rc-66855b96-20241106"
+    "react-dom": "19.0.0-rc-66855b96-20241106",
+    "react-error-boundary": "^4.1.2"
   },
   "devDependencies": {
     "@types/node": "^20",
