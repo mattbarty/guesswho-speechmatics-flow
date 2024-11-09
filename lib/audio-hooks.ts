@@ -1,5 +1,20 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
 
+// AudioWorklet processor code as a string
+const workletCode = `
+class AudioProcessor extends AudioWorkletProcessor {
+  process(inputs, outputs, parameters) {
+    const input = inputs[0];
+    if (input && input.length > 0) {
+      this.port.postMessage(input[0]);
+    }
+    return true;
+  }
+}
+
+registerProcessor('audio-processor', AudioProcessor);
+`;
+
 /**
  *
  * Hook for getting PCM (f32) microphone audio in the browser.
@@ -10,54 +25,98 @@ import { useRef, useState, useCallback, useEffect } from 'react';
 export function usePcmMicrophoneAudio(onAudio: (audio: Float32Array) => void) {
 	const [isRecording, setIsRecording] = useState(false);
 	const mediaStreamRef = useRef<MediaStream>();
+	const workletNodeRef = useRef<AudioWorkletNode>();
+	const audioContextRef = useRef<AudioContext>();
+
+	// Initialize AudioWorklet
+	const initializeAudioWorklet = useCallback(
+		async (audioContext: AudioContext) => {
+			const blob = new Blob([workletCode], { type: 'application/javascript' });
+			const url = URL.createObjectURL(blob);
+
+			try {
+				await audioContext.audioWorklet.addModule(url);
+			} finally {
+				URL.revokeObjectURL(url);
+			}
+		},
+		[]
+	);
 
 	const startRecording = useCallback(
 		async (audioContext: AudioContext, deviceId?: string) => {
-			// If stream is present, it means we're already recording, nothing to do
+			// If stream is present, it means we're already recording
 			if (mediaStreamRef.current) {
 				return mediaStreamRef.current;
 			}
 
-			const mediaStream = await navigator.mediaDevices.getUserMedia({
-				audio: {
-					deviceId,
-					sampleRate: audioContext?.sampleRate,
-					sampleSize: 16,
-					channelCount: 1,
-					echoCancellation: true,
-					noiseSuppression: true,
-					autoGainControl: true,
-				},
-			});
+			try {
+				// Initialize audio context and worklet if needed
+				audioContextRef.current = audioContext;
+				await initializeAudioWorklet(audioContext);
 
-			setIsRecording(true);
+				const mediaStream = await navigator.mediaDevices.getUserMedia({
+					audio: {
+						deviceId,
+						sampleRate: audioContext.sampleRate,
+						sampleSize: 16,
+						channelCount: 1,
+						echoCancellation: true,
+						noiseSuppression: true,
+						autoGainControl: true,
+					},
+				});
 
-			// TODO see if we can do this without script processor
-			const input = audioContext.createMediaStreamSource(mediaStream);
-			const processor = audioContext.createScriptProcessor(512, 1, 1);
+				const input = audioContext.createMediaStreamSource(mediaStream);
+				const workletNode = new AudioWorkletNode(
+					audioContext,
+					'audio-processor'
+				);
 
-			input.connect(processor);
-			processor.connect(audioContext.destination);
+				// Handle audio data from the worklet
+				workletNode.port.onmessage = (event) => {
+					onAudio(event.data);
+				};
 
-			processor.onaudioprocess = (event) => {
-				const inputBuffer = event.inputBuffer.getChannelData(0);
-				onAudio(inputBuffer);
-			};
+				input.connect(workletNode);
+				workletNode.connect(audioContext.destination);
 
-			mediaStreamRef.current = mediaStream;
-			return mediaStream;
+				mediaStreamRef.current = mediaStream;
+				workletNodeRef.current = workletNode;
+				setIsRecording(true);
+
+				return mediaStream;
+			} catch (error) {
+				console.error('Error starting recording:', error);
+				throw error;
+			}
 		},
-		[onAudio]
+		[onAudio, initializeAudioWorklet]
 	);
 
 	const stopRecording = useCallback(() => {
-		for (const track of mediaStreamRef.current?.getTracks() ?? []) {
-			track.stop();
+		if (workletNodeRef.current) {
+			workletNodeRef.current.disconnect();
+			workletNodeRef.current = undefined;
 		}
-		mediaStreamRef.current = undefined;
+
+		if (mediaStreamRef.current) {
+			mediaStreamRef.current.getTracks().forEach((track) => track.stop());
+			mediaStreamRef.current = undefined;
+		}
 
 		setIsRecording(false);
 	}, []);
+
+	// Cleanup on unmount
+	useEffect(() => {
+		return () => {
+			stopRecording();
+			if (audioContextRef.current?.state !== 'closed') {
+				audioContextRef.current?.close();
+			}
+		};
+	}, [stopRecording]);
 
 	return { startRecording, stopRecording, isRecording };
 }
