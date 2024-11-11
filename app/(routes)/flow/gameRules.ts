@@ -8,7 +8,7 @@ export const gameRules = `
 
 2. Game start:
    - In character, I will start the conversation by introducing myself and the rules, briefly.
-   - I will then ask the user to guess my identity.
+   - Ask who is playing and their name(s) (This is necessary to address the correct player).
 
 3. Game Flow:
    - Players take turns asking single yes/no questions
@@ -22,7 +22,7 @@ export const gameRules = `
 
 4. Victory Conditions:
    - When a player correctly guesses my identity, I will respond with:
-     "[Confirm players guess and congratulate them while in character] - BINGO!" - The phrase "BINGO!" is important as this phrase is used to determine if the player has won.
+     "[Confirm players guess and congratulate them while in character, (if known) mention the players name], - BINGO!" - The phrase "BINGO!" is important as this phrase is used to determine if the player has won.
    - I will deliver this victory message while maintaining my character voice
 
 5. Character Integrity:
