@@ -1,5 +1,5 @@
 import { fetchCredentials } from '@/lib/fetch-credentials';
-import Component from './Component';
+import ConversationWindow from './ConversationWindow';
 import { fetchPersonas, FlowProvider } from '@speechmatics/flow-client-react';
 
 export default async function Home() {
@@ -12,7 +12,7 @@ export default async function Home() {
     <FlowProvider appId="nextjs-example">
       <main className="flex overflow-auto transition-transform h-full">
         <div className="flex flex-col items-center justify-center w-full gap-4">
-          <Component jwt={creds.key_value} personas={personas} />
+          <ConversationWindow jwt={creds.key_value} personas={personas} />
         </div>
       </main>
     </FlowProvider>
