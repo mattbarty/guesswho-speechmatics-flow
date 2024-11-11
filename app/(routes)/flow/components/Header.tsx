@@ -50,9 +50,7 @@ export function Header({
       <h1 className="text-xl font-bold">Conversation</h1>
       <Dialog open={isOpen} onOpenChange={handleOpenChange}>
         <DialogTrigger asChild>
-          <Button variant="ghost" size="icon">
-            <Menu className="h-5 w-5" />
-          </Button>
+          <Menu size={24} strokeWidth={3} className="hover:cursor-pointer" />
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>

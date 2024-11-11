@@ -8,8 +8,9 @@ import {
 } from '@/lib/audio-hooks';
 import { useFlow, useFlowEventListener } from '@speechmatics/flow-client-react';
 import { TemplateVariables } from './types';
-import { sanitizeTemplateVariables } from './utils';
+import { getRandomCharacter } from './utils';
 import { Header } from './components/Header';
+import { gameRules } from './gameRules';
 
 const ConversationWindow = ({
   jwt,
@@ -44,6 +45,8 @@ const ConversationWindow = ({
     },
   );
 
+  const [currentCharacter, setCurrentCharacter] = useState<string>('');
+
   const startSession = useCallback(
     async ({
       personaId,
@@ -56,26 +59,21 @@ const ConversationWindow = ({
     }) => {
       try {
         setLoading(true);
-        console.log('Starting session with:', {
-          personaId,
-          deviceId,
-          rawTemplateVariables: templateVariables
-        });
+
+        // Get random character data
+        const randomCharacter = getRandomCharacter();
+        setCurrentCharacter(randomCharacter.characterName);
 
         const audioContext = new AudioContext({ sampleRate: SAMPLE_RATE });
         setAudioContext(audioContext);
-
-        // Transform variables to API-compatible format
-        const apiTemplateVariables = sanitizeTemplateVariables(templateVariables);
-        console.log('Sanitized template variables:', apiTemplateVariables);
 
         const config = {
           config: {
             template_id: personaId,
             template_variables: {
-              persona: apiTemplateVariables.persona,
-              style: apiTemplateVariables.style,
-              context: apiTemplateVariables.context,
+              persona: randomCharacter.persona,
+              style: randomCharacter.style,
+              context: gameRules,
             },
           },
           audioFormat: {
@@ -110,6 +108,7 @@ const ConversationWindow = ({
     endConversation();
     stopRecording();
     await audioContext?.close();
+    setCurrentCharacter(''); // Reset character when session ends
   }, [endConversation, stopRecording, audioContext]);
 
   return (
