@@ -2,7 +2,6 @@ export interface TemplateVariables {
 	persona: string;
 	style: string;
 	context: string;
-	gameRules: string;
 }
 
 export interface Character {

@@ -4,16 +4,13 @@ export function Status({ isRecording }: { isRecording: boolean; }) {
   const { socketState, sessionId } = useFlow();
 
   return (
-    <article>
-      <header>Status</header>
-      <dl>
-        <dt>🔌 Socket is</dt>
-        <dd>{socketState ?? '(uninitialized)'}</dd>
-        <dt>💬 Session ID</dt>
-        <dd>{sessionId ?? '(none)'}</dd>
-        <dt>🎤 Microphone is</dt>
-        <dd>{isRecording ? 'recording' : 'not recording'}</dd>
-      </dl>
-    </article>
+    <div>
+      <p>🔌 Socket is</p>
+      <div>{socketState ?? '(uninitialized)'}</div>
+      <p>💬 Session ID</p>
+      <div>{sessionId ?? '(none)'}</div>
+      <p>🎤 Microphone is</p>
+      <div>{isRecording ? 'recording' : 'not recording'}</div>
+    </div>
   );
 }

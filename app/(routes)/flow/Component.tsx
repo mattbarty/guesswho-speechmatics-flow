@@ -6,13 +6,10 @@ import {
   usePcmMicrophoneAudio,
   usePlayPcm16Audio,
 } from '@/lib/audio-hooks';
-import { ErrorBoundary } from 'react-error-boundary';
 import { Controls } from './Controls';
 import { Status } from './Status';
-import { ErrorFallback } from '@/lib/components/ErrorFallback';
-import { OutputView } from './OutputView';
 import { useFlow, useFlowEventListener } from '@speechmatics/flow-client-react';
-import { ConversationConfig, TemplateVariables } from './types';
+import { TemplateVariables } from './types';
 import { sanitizeTemplateVariables } from './utils';
 
 export default function Component({
@@ -111,17 +108,24 @@ export default function Component({
   }, [endConversation, stopRecording, audioContext]);
 
   return (
-    <section>
-      <section className="grid">
-        <Controls
-          personas={personas}
-          loading={loading}
-          startSession={startSession}
-          stopSession={stopSession}
-        />
-        <Status isRecording={isRecording} />
-      </section>
-    </section>
+    <div className="flex flex-col items-center justify-between w-full h-full gap-4 bg-pink-500">
+      <div className="flex flex-col items-center justify-between w-full gap-4 bg-blue-500 h-full">
+        <div className="flex flex-col items-center justify-between w-full gap-4 bg-red-500 shrink-0">
+          <Controls
+            personas={personas}
+            loading={loading}
+            startSession={startSession}
+            stopSession={stopSession}
+          />
+        </div>
+        <div className="flex flex-col items-center justify-center w-full gap-4 bg-yellow-500 grow-1 h-full">
+          <Status isRecording={isRecording} />
+        </div>
+        <div className="flex flex-col items-center justify-between w-full gap-4 bg-green-500 shrink-0">
+          <h1>Hello</h1>
+        </div>
+      </div>
+    </div>
   );
 }
 
