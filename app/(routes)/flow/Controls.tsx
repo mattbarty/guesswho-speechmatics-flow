@@ -27,7 +27,7 @@ export function Controls({
   const connected = socketState === 'open';
   const [personaId, setPersonaId] = useState(Object.keys(personas)[0]);
   const [deviceId, setDeviceId] = useState<string>();
-  const [templateVariables, setTemplateVariables] = useState<TemplateVariables>({});
+  const [templateVariables, setTemplateVariables] = useState<TemplateVariables>({ persona: '', style: '', context: '', gameRules: '' });
 
   return (
     <article>

@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import '@picocss/pico';
 
 export const metadata: Metadata = {
   title: 'Speechmatics Flow example',
@@ -14,28 +13,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
-        <header className="container">
-          <nav>
-            <ul>
-              <li>
-                <h6>Speechmatics ❤️ NextJS</h6>
-              </li>
-            </ul>
-            <ul>
-              <li>
-                <a href="/flow">Flow</a>
-              </li>
-              <li>
-                <a href="/batch">Batch</a>
-              </li>
-              <li>
-                <a href="/real-time">Real-time</a>
-              </li>
-            </ul>
-          </nav>
-        </header>
-        <main className="container">{children}</main>
+      <body className={`flex flex-1 flex-col h-screen`}>
+        <div className="min-h-screen">{children}</div>
       </body>
     </html>
   );

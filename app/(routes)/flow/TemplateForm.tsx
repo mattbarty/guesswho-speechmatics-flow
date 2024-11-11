@@ -65,7 +65,9 @@ export function TemplateForm({ variables, onChange }: TemplateFormProps) {
           <button
             type="button"
             className="secondary"
-            onClick={() => onChange({})}
+            onClick={() =>
+              onChange({ persona: '', style: '', context: '', gameRules: '' })
+            }
           >
             Clear All Variables
           </button>

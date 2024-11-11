@@ -10,7 +10,11 @@ export default async function Home() {
 
   return (
     <FlowProvider appId="nextjs-example">
-      <Component jwt={creds.key_value} personas={personas} />
+      <main className="flex overflow-auto transition-transform h-full">
+        <div className="flex flex-col items-center justify-center w-full gap-4">
+          <Component jwt={creds.key_value} personas={personas} />
+        </div>
+      </main>
     </FlowProvider>
   );
 }

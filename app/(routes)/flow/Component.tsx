@@ -37,8 +37,8 @@ export default function Component({
   const [mediaStream, setMediaStream] = useState<MediaStream>();
 
   const { startRecording, stopRecording, isRecording } = usePcmMicrophoneAudio(
-    (audio) => {
-      sendAudio(audio);
+    (audio: Float32Array) => {
+      sendAudio(audio.buffer);
     },
   );
 
@@ -70,7 +70,11 @@ export default function Component({
         const config = {
           config: {
             template_id: personaId,
-            template_variables: apiTemplateVariables,
+            template_variables: {
+              persona: apiTemplateVariables.persona,
+              style: apiTemplateVariables.style,
+              context: apiTemplateVariables.context,
+            },
           },
           audioFormat: {
             type: 'raw',
@@ -81,7 +85,14 @@ export default function Component({
 
         console.log('Final conversation config:', config);
 
-        await startConversation(jwt, config);
+        await startConversation(jwt, {
+          config: config.config,
+          audioFormat: {
+            type: "raw" as const,
+            encoding: "pcm_f32le" as const,
+            sample_rate: config.audioFormat.sample_rate
+          }
+        });
         const mediaStream = await startRecording(audioContext, deviceId);
         setMediaStream(mediaStream);
       } catch (error) {
@@ -101,7 +112,6 @@ export default function Component({
 
   return (
     <section>
-      <h3>Flow Example</h3>
       <section className="grid">
         <Controls
           personas={personas}
@@ -110,11 +120,6 @@ export default function Component({
           stopSession={stopSession}
         />
         <Status isRecording={isRecording} />
-      </section>
-      <section>
-        <ErrorBoundary FallbackComponent={ErrorFallback}>
-          <OutputView />
-        </ErrorBoundary>
       </section>
     </section>
   );

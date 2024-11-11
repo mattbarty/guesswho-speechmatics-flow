@@ -1,8 +1,20 @@
 export interface TemplateVariables {
-	persona?: string;
-	style?: string;
-	context?: string;
-	[key: string]: string | undefined;
+	persona: string;
+	style: string;
+	context: string;
+	gameRules: string;
+}
+
+export interface Character {
+	name: string;
+	description: string;
+	styleGuide: string;
+	eraLimit: string;
+	keyTraits: string[];
+}
+
+export interface Characters {
+	[key: string]: Character;
 }
 
 export interface ApiTemplateVariables {
