@@ -257,17 +257,33 @@ const ConversationWindow = ({
       />
       <div className="flex flex-col items-center justify-between w-full h-full gap-4 p-4">
         <div className="flex flex-col items-center justify-between w-full gap-4 grow-1 h-full">
-          <AudioVisualizer
-            isUserSpeaking={isRecording}
-            isAgentSpeaking={isAgentSpeaking}
-            userAudioLevel={userAudioLevel}
-            agentAudioLevel={agentAudioLevel}
-          />
+          <div className="flex flex-col items-center justify-center w-full gap-4 grow-0">
+            <div className="flex flex-col items-center gap-2">
+              {isRecording ?
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-red-500 rounded-full" /> Recording
+                </div>
+                :
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-gray-300 rounded-full" /> Not recording
+                </div>
+              }
+              <div className="text-xs text-gray-500">{sessionId ?? ''}</div>
+            </div>
+          </div>
           <div>
-            <div className="grid">
+            <div>
+              <AudioVisualizer
+                isUserSpeaking={isRecording}
+                isAgentSpeaking={isAgentSpeaking}
+                userAudioLevel={userAudioLevel}
+                agentAudioLevel={agentAudioLevel}
+              />
+            </div>
+            <div className="flex flex-col items-center justify-center gap-2">
               <button
                 type="button"
-                className={connected ? 'secondary' : undefined}
+                className={`${connected ? 'bg-red-500' : 'bg-sky-500'} text-white px-4 py-2 rounded-md`}
                 aria-busy={loading}
                 onClick={
                   connected
@@ -283,16 +299,7 @@ const ConversationWindow = ({
               </button>
             </div>
           </div>
-        </div>
-        <div className="flex flex-col items-center justify-center w-full gap-4 grow-0">
-          <div>
-            <p>🔌 Socket is</p>
-            <div>{socketState ?? '(uninitialized)'}</div>
-            <p>💬 Session ID</p>
-            <div>{sessionId ?? '(none)'}</div>
-            <p>🎤 Microphone is</p>
-            <div>{isRecording ? 'recording' : 'not recording'}</div>
-          </div>
+          <p>made with ❤️ by <a className="text-sky-500 hover:underline hover:text-sky-600 font-bold" href="https://mattbarty.com/projects">MattBarty</a></p>
         </div>
       </div>
     </div>

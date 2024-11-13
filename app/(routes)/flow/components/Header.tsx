@@ -47,7 +47,7 @@ export function Header({
 
   return (
     <header className="flex justify-between items-center w-full p-4 border-b">
-      <h1 className="text-xl font-bold">Conversation</h1>
+      <h1 className="text-xl font-bold">GuessWho.flow</h1>
       <Dialog open={isOpen} onOpenChange={handleOpenChange}>
         <DialogTrigger asChild>
           <Menu size={24} strokeWidth={3} className="hover:cursor-pointer" />
